@@ -23,7 +23,7 @@ function daqsave(h, s::DaqSamplingRate, name=""; version=1)
     
 end
 
-function daqload(::Type{DaqSamplingRate}, h; version=1)
+function daqload(::Type{DaqSamplingRate}, h)
 
     # Is this actually something related to DAQHDF5?
     "__VERSION__" ∉ keys(attributes(h)) &&
@@ -31,8 +31,8 @@ function daqload(::Type{DaqSamplingRate}, h; version=1)
         
     # Are we reading the correct version?
     ver = read(attributes(h)["__VERSION__"])
-    if ver != version
-        throw(DAQIOVersionError("Error when reading `DaqSamplingRate`. Version $version expected. Got $ver", "DaqSamplingRate", ver))
+    if ver != 1
+        throw(DAQIOVersionError("Error when reading `DaqSamplingRate`. Version 1 expected. Got $ver", "DaqSamplingRate", ver))
     end
     
     # Check if we are reading an actual DaqConfig
@@ -72,7 +72,7 @@ function daqsave(h, s::DaqSamplingTimes{DateTime}, name=""; version=1)
     
 end
 
-function daqload(::Type{DaqSamplingTimes}, h; version=1)
+function daqload(::Type{DaqSamplingTimes}, h)
 
     # Is this actually something related to DAQHDF5?
     "__VERSION__" ∉ keys(attributes(h)) &&
@@ -80,8 +80,8 @@ function daqload(::Type{DaqSamplingTimes}, h; version=1)
         
     # Are we reading the correct version
     ver = read(attributes(h)["__VERSION__"])
-    if ver != version
-        throw(DAQIOVersionError("Error when reading `DaqSamplingTimes`. Version $version expected. Got $ver", "DaqSamplingTimes", ver))
+    if ver != 1
+        throw(DAQIOVersionError("Error when reading `DaqSamplingTimes`. Version 1 expected. Got $ver", "DaqSamplingTimes", ver))
     end
     
     # Check if we are reading an actual DaqConfig
@@ -100,7 +100,7 @@ function daqload(::Type{DaqSamplingTimes}, h; version=1)
 end
 
 
-function daqload(::Type{AbstractDaqSampling}, h; version=1)
+function daqload(::Type{AbstractDaqSampling}, h)
 
     # Is this actually something related to DAQHDF5?
     "__VERSION__" ∉ keys(attributes(h)) &&
@@ -108,8 +108,8 @@ function daqload(::Type{AbstractDaqSampling}, h; version=1)
         
     # Are we reading the correct version
     ver = read(attributes(h)["__VERSION__"])
-    if ver != version
-        throw(DAQIOVersionError("Error when reading sampling rate. Version $version expected. Got $ver", "DaqConfig", ver))
+    if ver != 1
+        throw(DAQIOVersionError("Error when reading sampling rate. Version 1 expected. Got $ver", "DaqConfig", ver))
     end
     
     # Check if we are reading an actual sampling rate info
@@ -121,9 +121,9 @@ function daqload(::Type{AbstractDaqSampling}, h; version=1)
     _type_ = read(attributes(h)["__TYPE__"])
 
     if _type_ == "DaqSamplingRate"
-        return daqload(DaqSamplingRate, h; version=version)
+        return daqload(DaqSamplingRate, h)
     elseif _type_ == "DaqSamplingTimes"
-        return daqload(DaqSamplingTimes, h; version=version)
+        return daqload(DaqSamplingTimes, h)
     end
 
 end

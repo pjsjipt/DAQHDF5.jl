@@ -12,5 +12,7 @@ include("errors.jl")
 include("config.jl")
 include("channels.jl")
 include("sampling.jl")
+include("measdata.jl")
+
 
 end

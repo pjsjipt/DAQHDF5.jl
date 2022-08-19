@@ -63,7 +63,7 @@ end
 
 
 
-function daqload(::Type{DaqConfig}, h; version=1)
+function daqload(::Type{DaqConfig}, h)
 
     # Is this actually something related to DAQHDF5?
     "__VERSION__" ∉ keys(attributes(h)) &&
@@ -71,8 +71,8 @@ function daqload(::Type{DaqConfig}, h; version=1)
         
     # Are we reading the correct version?
     ver = read(attributes(h)["__VERSION__"])
-    if ver != version
-        throw(DAQIOVersionError("Error when reading `DaqConfig`. Version $version expected. Got $ver", "DaqConfig", ver))
+    if ver != 1
+        throw(DAQIOVersionError("Error when reading `DaqConfig`. Version 1 expected. Got $ver", "DaqConfig", ver))
     end
     
     # Check if we are reading an actual DaqConfig
