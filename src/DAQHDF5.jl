@@ -9,7 +9,7 @@ function daqsave end
 function daqload end
 
 include("errors.jl")
-
 include("config.jl")
+include("channels.jl")
 
 end
