@@ -1,5 +1,15 @@
 module DAQHDF5
 
-# Write your package code here.
+using DAQCore
+using HDF5
+
+export daqsave, daqload
+
+function daqsave end
+function daqload end
+
+include("errors.jl")
+
+include("config.jl")
 
 end
