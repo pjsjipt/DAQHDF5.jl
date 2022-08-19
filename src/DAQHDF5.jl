@@ -11,5 +11,6 @@ function daqload end
 include("errors.jl")
 include("config.jl")
 include("channels.jl")
+include("sampling.jl")
 
 end
