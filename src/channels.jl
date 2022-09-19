@@ -9,9 +9,8 @@ function daqsave(h, c::DaqChannels, name=""; version=1)
 
     g = create_group(h, name)
 
-    attributes(g)["__VERSION__"] = 1
-    attributes(g)["__CLASS__"] = "AbstractDaqChannels"
-    attributes(g)["__TYPE__"] = "DaqChannels"
+    attributes(g)["__DAQVERSION__"] = 1
+    attributes(g)["__DAQCLASS__"] = ["AbstractDaqChannels", "DaqChannels"]
 
     g["devname"] = c.devname
     g["devtype"] = c.devtype
@@ -32,24 +31,24 @@ end
 function daqload(::Type{DaqChannels}, h)
 
     # Is this actually something related to DAQHDF5?
-    "__VERSION__" ∉ keys(attributes(h)) &&
-        DAQIOTypeError("No __VERSION__ flag found while trying to read DaqConfig")
+    "__DAQVERSION__" ∉ keys(attributes(h)) &&
+        DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DaqConfig")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__VERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DaqConfig`. Version 1 expected. Got $ver", "DaqConfig", ver))
     end
 
     # Check if we are reading an actual DaqConfig
-    _type_ = read(attributes(h)["__TYPE__"])
-    if _type_ != "DaqChannels"
+    _type_ = read(attributes(h)["__DAQCLASS__"])
+    if _type_[end] != "DaqChannels"
         throw(DAQIOTypeError("Type error: expected `DaqChannels` got $_type_ "))
     end
 
     # Everything appears to be ok!
-    devname = read(h["devname"])
-    devtype = read(h["devtype"])
+    devname = read(h["devname"])[begin]
+    devtype = read(h["devtype"])[begin]
 
     chans = read(h["channels"])
 

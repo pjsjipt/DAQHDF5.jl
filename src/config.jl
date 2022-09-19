@@ -22,9 +22,8 @@ function daqsave(h, c::DaqConfig, name=""; version=1)
 
     g = create_group(h, name)
 
-    attributes(g)["__VERSION__"] = 1
-    attributes(g)["__CLASS__"] = "AbstractDaqConfig"
-    attributes(g)["__TYPE__"] = "DaqConfig"
+    attributes(g)["__DAQVERSION__"] = 1
+    attributes(g)["__DAQCLASS__"] = ["AbstractDaqConfig", "DaqConfig"]
 
     g["devname"] = c.devname
     g["devtype"] = c.devtype
@@ -66,25 +65,25 @@ end
 function daqload(::Type{DaqConfig}, h)
 
     # Is this actually something related to DAQHDF5?
-    "__VERSION__" ∉ keys(attributes(h)) &&
-        DAQIOTypeError("No __VERSION__ flag found while trying to read in DaqConfig")
+    "__DAQVERSION__" ∉ keys(attributes(h)) &&
+        DAQIOTypeError("No __DAQVERSION__ flag found while trying to read in DaqConfig")
         
     # Are we reading the correct version?
-    ver = read(attributes(h)["__VERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DaqConfig`. Version 1 expected. Got $ver", "DaqConfig", ver))
     end
     
     # Check if we are reading an actual DaqConfig
-    _type_ = read(attributes(h)["__TYPE__"])
-    if _type_ != "DaqConfig"
+    _type_ = read(attributes(h)["__DAQCLASS__"])
+    if _type_[end] != "DaqConfig"
         throw(DAQIOTypeError("Type error: expected `DaqConfig` got $_type_ "))
     end
 
     # If we got to this point, everything should work smoothly...
 
-    devname = read(h["devname"])
-    devtype = read(h["devtype"])
+    devname = read(h["devname"])[begin]
+    devtype = read(h["devtype"])[begin]
 
     kw = keys(h)
     
