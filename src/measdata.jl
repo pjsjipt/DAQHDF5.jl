@@ -12,8 +12,8 @@ function daqsave(h, x::MeasData, name=""; version=1)
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractMeasData", "MeasData"]
 
-    g["devname"] = x.devname
-    g["devtype"] = x.devtype
+    g["__devname__"] = x.devname
+    g["__devtype__"] = x.devtype
 
     # Sampling infor
     daqsave(g, x.sampling, "sampling", version=version)
@@ -49,8 +49,8 @@ function daqload(::Type{MeasData}, h)
     end
 
 
-    devname = read(h["devname"])[begin]
-    devtype = read(h["devtype"])[begin]
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
 
     # Read sampling info
     sampling = daqload(AbstractDaqSampling, h["sampling"])
@@ -70,6 +70,58 @@ end
 
     
 function daqsave(h, x::MeasDataSet, name=""; version=1)
+    
+    if name==""
+        name = devname(x)
+    end
+    g = create_group(h, name)
 
+    attributes(g)["__DAQVERSION__"] = 1
+    attributes(g)["__DAQCLASS__"] = ["AbstractMeasData", "MeasDataSet"]
+
+    g["__devname__"] = x.devname
+    g["__devtype__"] = x.devtype
+    g["__time__"] = [tt.instant.periods.value for tt in s.t]
+
+    # Get the names of each individual data set:
+    g["__devlist__"] = devname.(x.devices)
+
+    # Now will save each individual data set
+    for devdata in x.devices
+        daqsave(g, devdata, devname(devdata); version=1)
+    end
     
 end
+
+
+function daqload(::Type{MeasDataSet}, h)
+
+    # Is this actually something related to DAQHDF5?
+    "__DAQVERSION__" ∉ keys(attributes(h)) &&
+        DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DaqConfig")
+
+    # Are we reading the correct version?
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
+    if ver != 1
+        throw(DAQIOVersionError("Error when reading `MeasData`. Version 1 expected. Got $ver", "MeasData", ver))
+    end
+
+    # Check if we are reading an actual DaqConfig
+    _type_ = read(attributes(h)["__DAQCLASS__"])
+    if _type_[end] != "MeasDataSet"
+        throw(DAQIOTypeError("Type error: expected `DaqChannels` got $_type_ "))
+    end
+
+
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
+    ms = read(h["__time__"])[begin]
+    t = DateTime(Dates.UTInstant{Millisecond}(Millisecond(ms)))
+
+    devices = read(h["__devlist__"])
+
+    data = [daqload(MeasData, h[dev]) for dev in devices]
+
+    return MeasDataSet(devname, devtype, t, data)
+end
+

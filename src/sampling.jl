@@ -16,7 +16,7 @@ function daqsave(h, s::DaqSamplingRate, name=""; version=1)
 
     g["rate"] = s.rate
     g["nsamples"] = s.nsamples
-    g["time"] = s.time.instant.periods.value
+    g["__time__"] = s.time.instant.periods.value
 
     return
     
@@ -42,7 +42,7 @@ function daqload(::Type{DaqSamplingRate}, h)
 
     rate = read(h["rate"])[begin]
     nsamples = read(h["nsamples"])[begin]
-    ms = read(h["time"])[begin]
+    ms = read(h["__time__"])[begin]
 
     t = DateTime(Dates.UTInstant{Millisecond}(Millisecond(ms)))
     
@@ -64,7 +64,7 @@ function daqsave(h, s::DaqSamplingTimes{DateTime}, name=""; version=1)
     attributes(g)["__DAQCLASS__"] = ["AbstractDaqSampling","DaqSamplingTimes"]
 
     
-    g["time"] = [tt.instant.periods.value for tt in s.t]
+    g["__time__"] = [tt.instant.periods.value for tt in s.t]
     
     return
     
@@ -88,7 +88,7 @@ function daqload(::Type{DaqSamplingTimes}, h)
         throw(DAQIOTypeError("Type error: expected `DaqSamplingTimes` got $_type_ "))
     end
 
-    t = read(h["time"])
+    t = read(h["__time__"])
 
     # We are going to assume that it is a DateTime
     t1 = [DateTime(Dates.UTInstant{Millisecond}(Millisecond(ms))) for ms in t]

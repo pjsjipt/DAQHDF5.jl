@@ -12,8 +12,8 @@ function daqsave(h, c::DaqChannels, name=""; version=1)
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractDaqChannels", "DaqChannels"]
 
-    g["devname"] = c.devname
-    g["devtype"] = c.devtype
+    g["__devname__"] = c.devname
+    g["__devtype__"] = c.devtype
 
     g["channels"] = daqchannels(c)
 
@@ -47,8 +47,8 @@ function daqload(::Type{DaqChannels}, h)
     end
 
     # Everything appears to be ok!
-    devname = read(h["devname"])[begin]
-    devtype = read(h["devtype"])[begin]
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
 
     chans = read(h["channels"])
 

@@ -25,8 +25,8 @@ function daqsave(h, c::DaqConfig, name=""; version=1)
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractDaqConfig", "DaqConfig"]
 
-    g["devname"] = c.devname
-    g["devtype"] = c.devtype
+    g["__devname__"] = c.devname
+    g["__devtype__"] = c.devtype
 
     if length(c.iparams) > 0
         gipar = create_group(g, "iparams")
@@ -82,8 +82,8 @@ function daqload(::Type{DaqConfig}, h)
 
     # If we got to this point, everything should work smoothly...
 
-    devname = read(h["devname"])[begin]
-    devtype = read(h["devtype"])[begin]
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
 
     kw = keys(h)
     
