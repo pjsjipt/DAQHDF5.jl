@@ -23,7 +23,7 @@ function daqload(::Type{DaqPoints}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DaqConfig")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])[begin]
+    ver = read(attributes(h)["__DAQVERSION__"])
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DaqPoints`. Version 1 expected. Got $ver", "DaqPoints", ver))
     end
@@ -71,7 +71,7 @@ function daqload(::Type{DaqCartesianPoints}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DaqConfig")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])[begin]
+    ver = read(attributes(h)["__DAQVERSION__"])
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DaqCartesianPoints`. Version 1 expected. Got $ver", "DaqCartesianPoints", ver))
     end
@@ -133,7 +133,7 @@ function daqload(::Type{DaqPointsProduct}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DaqConfig")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])[begin]
+    ver = read(attributes(h)["__DAQVERSION__"])
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DaqCartesianPoints`. Version 1 expected. Got $ver", "DaqCartesianPoints", ver))
     end

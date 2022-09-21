@@ -27,6 +27,11 @@ let
     ptsa = DaqPoints(x=1:10, y=0.1:0.1:1.0)
     ptsb = DaqCartesianPoints(w=1:3, z=0.1:0.1:1.0)
     ptsc = DaqPointsProduct((ptsa, ptsb))
+
+    odeva = OutputDev("robot", "ROBOT", ["x", "y", "z"], DaqConfig("robot", "ROBOT"))
+    odevb = OutputDev("ang", "turntable", ["theta"], DaqConfig("ang", "turntable"))
+    odevc = OutputDevSet("setup", (odeva, odevb))
+    
     
     h5open(fname, "w") do h
         daqsave(h, config, "config")
@@ -39,11 +44,15 @@ let
         daqsave(h, ptsa, "pointsa")
         daqsave(h, ptsb, "pointsb")
         daqsave(h, ptsc, "pointsc")
+        daqsave(h, odeva, "robot")
+        daqsave(h, odevb, "ang")
+        daqsave(h, odevc, "setup")
+        
     end
     
     h5open(fname, "r") do h
-        
-   
+
+    
         config1 = daqload(DaqConfig, h["config"])
         chans1 = daqload(DaqChannels, h["channels"])
         rr1 = daqload(DaqSamplingRate, h["samplingrate"])
@@ -55,7 +64,10 @@ let
         ptsb1 = daqload(DaqCartesianPoints, h["pointsb"])
         ptsc1 = daqload(DaqPointsProduct, h["pointsc"])
 
+        odeva1 = daqload(h["robot"])
+        odevc1 = daqload(h["setup"])
 
+    
         config2 = daqload(h["config"])
         chans2 = daqload(h["channels"])
         rr2 = daqload(h["samplingrate"])
@@ -182,6 +194,14 @@ let
         @test daqpoints(ptsc.points[1]) == daqpoints(ptsa)
         @test daqpoints(ptsc.points[2]) == daqpoints(ptsb)
 
+        @test axesnames(odeva1) == axesnames(odeva)
+        @test devname(odeva1) == devname(odeva)
+        @test odeva1.config.devname == devname(odeva)
+
+        @test devname(odevc1) == devname(odevc)
+        @test axesnames(odevc1) == axesnames(odevc)
+        @test axesnames(odevc1["robot"]) == axesnames(odeva)
+        @test axesnames(odevc1["ang"]) == axesnames(odevb)
         
         
     end
