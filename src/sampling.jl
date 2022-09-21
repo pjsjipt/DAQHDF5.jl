@@ -2,6 +2,8 @@
 
 using Dates
 
+DAQIOTABLE["DaqSamplingRate"] = DaqSamplingRate
+
 function daqsave(h, s::DaqSamplingRate, name=""; version=1)
 
 
@@ -16,7 +18,7 @@ function daqsave(h, s::DaqSamplingRate, name=""; version=1)
 
     g["rate"] = s.rate
     g["nsamples"] = s.nsamples
-    g["__time__"] = s.time.instant.periods.value
+    g["time"] = s.time.instant.periods.value
 
     return
     
@@ -29,7 +31,7 @@ function daqload(::Type{DaqSamplingRate}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read in DaqConfig")
         
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])[begin]
+    ver = read(attributes(h)["__DAQVERSION__"])
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DaqSamplingRate`. Version 1 expected. Got $ver", "DaqSamplingRate", ver))
     end
@@ -40,16 +42,16 @@ function daqload(::Type{DaqSamplingRate}, h)
         throw(DAQIOTypeError("Type error: expected `DaqSamplingRate` got $_type_ "))
     end
 
-    rate = read(h["rate"])[begin]
-    nsamples = read(h["nsamples"])[begin]
-    ms = read(h["__time__"])[begin]
+    rate = read(h["rate"])
+    nsamples = read(h["nsamples"])
+    ms = read(h["time"])
 
     t = DateTime(Dates.UTInstant{Millisecond}(Millisecond(ms)))
     
     return DaqSamplingRate(rate, nsamples, t)
 end
 
-
+DAQIOTABLE["DaqSamplingTimes"] = DaqSamplingTimes
 
 function daqsave(h, s::DaqSamplingTimes{DateTime}, name=""; version=1)
 
@@ -64,7 +66,7 @@ function daqsave(h, s::DaqSamplingTimes{DateTime}, name=""; version=1)
     attributes(g)["__DAQCLASS__"] = ["AbstractDaqSampling","DaqSamplingTimes"]
 
     
-    g["__time__"] = [tt.instant.periods.value for tt in s.t]
+    g["time"] = [tt.instant.periods.value for tt in s.t]
     
     return
     
@@ -84,11 +86,11 @@ function daqload(::Type{DaqSamplingTimes}, h)
     
     # Check if we are reading an actual DaqConfig
     _type_ = read(attributes(h)["__DAQCLASS__"])
-    if _type_[begin] != "DaqSamplingTimes"
+    if _type_[end] != "DaqSamplingTimes"
         throw(DAQIOTypeError("Type error: expected `DaqSamplingTimes` got $_type_ "))
     end
 
-    t = read(h["__time__"])
+    t = read(h["time"])
 
     # We are going to assume that it is a DateTime
     t1 = [DateTime(Dates.UTInstant{Millisecond}(Millisecond(ms))) for ms in t]
@@ -98,33 +100,4 @@ function daqload(::Type{DaqSamplingTimes}, h)
 end
 
 
-function daqload(::Type{AbstractDaqSampling}, h)
-
-    # Is this actually something related to DAQHDF5?
-    "__DAQVERSION__" ∉ keys(attributes(h)) &&
-        DAQIOTypeError("No __DAQVERSION__ flag found while trying to read in sampling rates")
-        
-    # Are we reading the correct version
-    ver = read(attributes(h)["__DAQVERSION__"])[begin]
-    if ver != 1
-        throw(DAQIOVersionError("Error when reading sampling rate. Version 1 expected. Got $ver", "DaqConfig", ver))
-    end
-    
-    # Check if we are reading an actual sampling rate info
-    _class_ = read(attributes(h)["__DAQCLASS__"])
-    if _class_[begin] != "AbstractDaqSampling"
-        throw(DAQIOTypeError("Type error: expected `AbstractDaqSampling` got $_type_ "))
-    end
-
-    _type_ = _class_[end]
-
-    if _type_ == "DaqSamplingRate"
-        return daqload(DaqSamplingRate, h)
-    elseif _type_ == "DaqSamplingTimes"
-        return daqload(DaqSamplingTimes, h)
-    end
-
-end
-
-        
     

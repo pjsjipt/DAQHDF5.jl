@@ -1,6 +1,7 @@
 
 # Reading MeasData objects. For now, we only read matrix data
 
+DAQIOTABLE["MeasData"] = MeasData
 
 function daqsave(h, x::MeasData, name=""; version=1)
 
@@ -37,7 +38,7 @@ function daqload(::Type{MeasData}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DaqConfig")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])[begin]
+    ver = read(attributes(h)["__DAQVERSION__"])
     if ver != 1
         throw(DAQIOVersionError("Error when reading `MeasData`. Version 1 expected. Got $ver", "MeasData", ver))
     end
@@ -49,17 +50,17 @@ function daqload(::Type{MeasData}, h)
     end
 
 
-    devname = read(h["__devname__"])[begin]
-    devtype = read(h["__devtype__"])[begin]
+    devname = read(h["__devname__"])
+    devtype = read(h["__devtype__"])
 
     # Read sampling info
-    sampling = daqload(AbstractDaqSampling, h["sampling"])
+    sampling = daqload(h["sampling"])
 
     # Read data
     data = read(h["data"])
 
     # Read Channel Info
-    chans = daqload(DaqChannels, h["channels"])
+    chans = daqload(h["channels"])
 
     return MeasData(devname, devtype, sampling, data, chans)
     
@@ -67,6 +68,7 @@ function daqload(::Type{MeasData}, h)
 end
 
 
+DAQIOTABLE["MeasDataSet"] = MeasDataSet
 
     
 function daqsave(h, x::MeasDataSet, name=""; version=1)

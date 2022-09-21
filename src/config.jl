@@ -2,6 +2,8 @@
 
 import DataStructures: OrderedDict
 
+DAQIOTABLE["DaqConfig"] = DaqConfig
+
 """
 `daqsave(h, path, c::DaqConfig)`
 
@@ -69,7 +71,7 @@ function daqload(::Type{DaqConfig}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read in DaqConfig")
         
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])[begin]
+    ver = read(attributes(h)["__DAQVERSION__"])
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DaqConfig`. Version 1 expected. Got $ver", "DaqConfig", ver))
     end
@@ -82,8 +84,8 @@ function daqload(::Type{DaqConfig}, h)
 
     # If we got to this point, everything should work smoothly...
 
-    devname = read(h["__devname__"])[begin]
-    devtype = read(h["__devtype__"])[begin]
+    devname = read(h["__devname__"])
+    devtype = read(h["__devtype__"])
 
     kw = keys(h)
     
