@@ -13,10 +13,9 @@ let
                        fx=1.1, fy=1.2, ox=rand(10), oy=rand(20))
     chans = DaqChannels("dev", "teste", "P", 64, "Pa", 101:164)
     chansb = DaqChannels("amb", "envconds", ["T", "Ta", "H", "Pa"], ["°C", "°C", "", "kPa"])
+
     tinit = now()
-
     rr = DaqSamplingRate(10.0, 10, tinit)
-
     rt = DaqSamplingTimes(rr)
 
     
@@ -25,6 +24,9 @@ let
     datab = MeasData("amb", "envconds", rt, rand(4,10), chansb)
     xdata = MeasDataSet("measurements", "measdataset", tinit, (data, datab))
     
+    ptsa = DaqPoints(x=1:10, y=0.1:0.1:1.0)
+    ptsb = DaqCartesianPoints(w=1:3, z=0.1:0.1:1.0)
+    ptsc = DaqPointsProduct((ptsa, ptsb))
     
     h5open(fname, "w") do h
         daqsave(h, config, "config")
@@ -34,10 +36,14 @@ let
         daqsave(h, data, "measdata")
         daqsave(h, datab, "measdata2")
         daqsave(h, xdata, "measurements")
-        
+        daqsave(h, ptsa, "pointsa")
+        daqsave(h, ptsb, "pointsb")
+        daqsave(h, ptsc, "pointsc")
     end
     
     h5open(fname, "r") do h
+        
+   
         config1 = daqload(DaqConfig, h["config"])
         chans1 = daqload(DaqChannels, h["channels"])
         rr1 = daqload(DaqSamplingRate, h["samplingrate"])
@@ -45,6 +51,10 @@ let
         data1 = daqload(MeasData, h["measdata"])
         datab1 = daqload(MeasData, h["measdata2"])
         xdata1 = daqload(MeasDataSet, h["measurements"])
+        ptsa1 = daqload(DaqPoints, h["pointsa"])
+        ptsb1 = daqload(DaqCartesianPoints, h["pointsb"])
+        ptsc1 = daqload(DaqPointsProduct, h["pointsc"])
+
 
         config2 = daqload(h["config"])
         chans2 = daqload(h["channels"])
@@ -130,29 +140,49 @@ let
         @test xdata.devdict == xdata1.devdict == xdata2.devdict
 
 
-        @test xdata["press"].devname == data.devname
-        @test xdata["press"].devtype == data.devtype
-        @test xdata["press"].data == data.data
-        @test xdata["press"].sampling == data.sampling
+        @test xdata1["press"].devname == data.devname
+        @test xdata1["press"].devtype == data.devtype
+        @test xdata1["press"].data == data.data
+        @test xdata1["press"].sampling == data.sampling
 
-        @test xdata["press"].chans.devname == data.chans.devname
-        @test xdata["press"].chans.devtype == data.chans.devtype
-        @test xdata["press"].chans.physchans == data.chans.physchans
-        @test xdata["press"].chans.channels == data.chans.channels
-        @test xdata["press"].chans.chanmap == data.chans.chanmap
-        @test xdata["press"].chans.units == data.chans.units
+        @test xdata1["press"].chans.devname == data.chans.devname
+        @test xdata1["press"].chans.devtype == data.chans.devtype
+        @test xdata1["press"].chans.physchans == data.chans.physchans
+        @test xdata1["press"].chans.channels == data.chans.channels
+        @test xdata1["press"].chans.chanmap == data.chans.chanmap
+        @test xdata1["press"].chans.units == data.chans.units
         
-        @test xdata["amb"].devname == datab.devname
-        @test xdata["amb"].devtype == datab.devtype
-        @test xdata["amb"].data == datab.data
-        @test xdata["amb"].sampling.t == datab.sampling.t
+        @test xdata1["amb"].devname == datab.devname
+        @test xdata1["amb"].devtype == datab.devtype
+        @test xdata1["amb"].data == datab.data
+        @test xdata1["amb"].sampling.t == datab.sampling.t
 
-        @test xdata["amb"].chans.devname == datab.chans.devname
-        @test xdata["amb"].chans.devtype == datab.chans.devtype
-        @test xdata["amb"].chans.physchans == datab.chans.physchans
-        @test xdata["amb"].chans.channels == datab.chans.channels
-        @test xdata["amb"].chans.chanmap == datab.chans.chanmap
-        @test xdata["amb"].chans.units == datab.chans.units
+        @test xdata1["amb"].chans.devname == datab.chans.devname
+        @test xdata1["amb"].chans.devtype == datab.chans.devtype
+        @test xdata1["amb"].chans.physchans == datab.chans.physchans
+        @test xdata1["amb"].chans.channels == datab.chans.channels
+        @test xdata1["amb"].chans.chanmap == datab.chans.chanmap
+        @test xdata1["amb"].chans.units == datab.chans.units
+
+        @test parameters(ptsa) == parameters(ptsa1)
+        @test parameters(ptsb) == parameters(ptsb1)
+        @test parameters(ptsc) == parameters(ptsc1)
+
+        @test daqpoints(ptsa) == daqpoints(ptsa1)
+        @test daqpoints(ptsb) == daqpoints(ptsb1)
+        @test daqpoints(ptsc) == daqpoints(ptsc1)
+
+        for i in 1:length(ptsb.axes)
+            @test ptsb.axes[i] == ptsb1.axes[i]
+        end
+        @test ptsc.ptsidx == ptsc1.ptsidx
+
+        @test parameters(ptsc.points[1]) == parameters(ptsa)
+        @test parameters(ptsc.points[2]) == parameters(ptsb)
+        @test daqpoints(ptsc.points[1]) == daqpoints(ptsa)
+        @test daqpoints(ptsc.points[2]) == daqpoints(ptsb)
+
+        
         
     end
     

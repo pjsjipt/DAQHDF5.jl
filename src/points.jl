@@ -116,6 +116,7 @@ function daqsave(h, pts::DaqPointsProduct, name; version=1)
     for p in pts.points
         pname = string(i)
         daqsave(g, p, pname)
+        i += i
     end
     
         
@@ -151,9 +152,9 @@ function daqload(::Type{DaqPointsProduct}, h)
     for i in 1:npts
         g = h[string(i)]
         class = read(attributes(g)["__DAQCLASS__"])
-        point = daqload(class[end], g)
+        point = daqload(g)
         push!(pts, point)
     end
-    return DaqPointsProduct(points, ptsidx)
+    return DaqPointsProduct(pts, ptsidx)
 end
 
