@@ -3,6 +3,7 @@ using Test
 using DAQCore
 using HDF5
 using Dates
+import DataStructures: OrderedDict
 
 @testset "DAQHDF5.jl" begin
 
