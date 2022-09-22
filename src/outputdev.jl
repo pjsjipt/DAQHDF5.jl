@@ -40,8 +40,8 @@ function daqload(::Type{OutputDev}, h)
     end
 
     _type_ = read(attributes(h)["__DAQCLASS__"])
-    if _type_[end] != "OutputDev"
-        throw(DAQIOTypeError("Type error: expected `OutputDev` got $_type_ "))
+    if _type_[begin] != "AbstractOutputDev"
+        throw(DAQIOTypeError("Type error: expected `AbstractOutputDev` got $_type_ "))
     end
 
     devname = read(h["__devname__"])

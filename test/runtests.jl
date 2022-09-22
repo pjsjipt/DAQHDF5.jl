@@ -31,6 +31,10 @@ let
     odeva = OutputDev("robot", "ROBOT", ["x", "y", "z"], DaqConfig())
     odevb = OutputDev("ang", "turntable", ["theta"], DaqConfig())
     odevc = OutputDevSet("setup", (odeva, odevb))
+
+    ideva = InputDev("input_a", "daqboard1", chans, config)
+    idevb = InputDev("input_b", "daqboard2", nothing, nothing)
+    idevc = DeviceSet("a+b", (ideva, idevb), 1)
     
     
     h5open(fname, "w") do h
@@ -47,11 +51,13 @@ let
         daqsave(h, odeva, "robot")
         daqsave(h, odevb, "ang")
         daqsave(h, odevc, "setup")
+        daqsave(h, ideva, "input_a")
+        daqsave(h, idevb, "input_b")
+        daqsave(h, idevc, "input_a+b")
         
     end
     
     h5open(fname, "r") do h
-
     
         config1 = daqload(DaqConfig, h["config"])
         chans1 = daqload(DaqChannels, h["channels"])
@@ -75,7 +81,11 @@ let
         data2 = daqload(h["measdata"])
         datab2 = daqload(MeasData, h["measdata2"])
         xdata2 = daqload(h["measurements"])
-        
+
+        ideva1 = daqload(h["input_a"])
+        idevb1 = daqload(h["input_b"])
+        idevc1 = daqload(h["input_a+b"])
+
         @test config1.iparams == config.iparams
         @test config1.sparams == config.sparams
         @test config1.fparams == config.fparams
@@ -197,6 +207,50 @@ let
         @test axesnames(odevc1) == axesnames(odevc)
         @test axesnames(odevc1["robot"]) == axesnames(odeva)
         @test axesnames(odevc1["ang"]) == axesnames(odevb)
+
+        @test devname(ideva1) == devname(ideva)
+        @test devname(idevb1) == devname(idevb)
+        @test devtype(ideva1) == devtype(ideva)
+        @test devtype(idevb1) == devtype(idevb)
+
+        @test isnothing(idevb1.chans)
+        @test isnothing(idevb1.config)
+
+        @test ideva1.config.iparams == ideva.config.iparams
+        @test ideva1.config.sparams == ideva.config.sparams
+        @test ideva1.config.fparams == ideva.config.fparams
+        @test ideva1.config.oparams == ideva.config.oparams
+
+        @test ideva1.chans.devname == ideva.chans.devname
+        @test ideva1.chans.devtype == ideva.chans.devtype
+        @test ideva1.chans.physchans == ideva.chans.physchans
+        @test ideva1.chans.channels == ideva.chans.channels
+        @test ideva1.chans.chanmap == ideva.chans.chanmap
+        @test ideva1.chans.units == ideva.chans.units
+
+        ideva2 = idevc1["input_a"]
+        idevb2 = idevc1["input_b"]
+        
+        @test devname(ideva2) == devname(ideva)
+        @test devname(idevb2) == devname(idevb)
+        @test devtype(ideva2) == devtype(ideva)
+        @test devtype(idevb2) == devtype(idevb)
+
+        @test isnothing(idevb2.chans)
+        @test isnothing(idevb2.config)
+
+        @test ideva2.config.iparams == ideva.config.iparams
+        @test ideva2.config.sparams == ideva.config.sparams
+        @test ideva2.config.fparams == ideva.config.fparams
+        @test ideva2.config.oparams == ideva.config.oparams
+
+        @test ideva2.chans.devname == ideva.chans.devname
+        @test ideva2.chans.devtype == ideva.chans.devtype
+        @test ideva2.chans.physchans == ideva.chans.physchans
+        @test ideva2.chans.channels == ideva.chans.channels
+        @test ideva2.chans.chanmap == ideva.chans.chanmap
+        @test ideva2.chans.units == ideva.chans.units
+        
         
         
     end

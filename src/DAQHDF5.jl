@@ -51,4 +51,6 @@ include("sampling.jl")
 include("measdata.jl")
 include("points.jl")
 include("outputdev.jl")
+include("inputdev.jl")
+
 end
