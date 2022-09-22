@@ -251,11 +251,41 @@ let
         @test ideva2.chans.chanmap == ideva.chans.chanmap
         @test ideva2.chans.units == ideva.chans.units
         
+    end
+end
+    
+    # Let's test experiment setup
+    let
+        fname = tempname()
+        # Let's create a daq device
+        dev = TestDaq("amb")
+        daqaddinput(dev, ["T", "Tbs", "Tbu", "Pa"], amp=0.0, freq=10.0, offset=1.0)
+
+        # Now the experimental points
+        pts_a = DaqCartesianPoints(x=[-100,0,100], z=[100,200,300,400])
+        pts_b = DaqPoints(ang=0:15.0:345.0)
+        pts = DaqPointsProduct(pts_a, pts_b)
+
+        # Actuators
+        odev_a = TestOutputDev("turntable", ["θ"])
+        odev_b = TestOutputDev("robot", ["A", "B"])
+        odev = OutputDevSet("wind_tunnel", (odev_a, odev_b))
+
+        axmap = OrderedDict("A"=>"z", "θ"=>"ang", "B"=>"x")
         
+        s = ExperimentSetup(dev, pts, odev, axmap)
+
+        h5open(fname, "w") do h
+            daqsave(h, s, "setup")
+        end
+
+        h5open(fname, "r") do h
+            s1 = daqload(h["setup"])
+        end
         
+
     end
     
         
-end
     
 end

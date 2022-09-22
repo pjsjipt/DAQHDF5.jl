@@ -1,4 +1,6 @@
 DAQIOTABLE["DaqPoints"] = DaqPoints
+DAQIOTABLE["DaqCartesianPoints"] = DaqCartesianPoints
+DAQIOTABLE["DaqPointsProduct"] = DaqPointsProduct
 
 
 function daqsave(h, pts::DaqPoints, name; version=1)
@@ -40,7 +42,6 @@ function daqload(::Type{DaqPoints}, h)
     return DaqPoints(params, pts)
 end
 
-DAQIOTABLE["DaqCartesianPoints"] = DaqCartesianPoints
 
 
 function daqsave(h, pts::DaqCartesianPoints, name; version=1)
@@ -97,7 +98,6 @@ function daqload(::Type{DaqCartesianPoints}, h)
     return DaqCartesianPoints(params, axes, pts)
 end
 
-DAQIOTABLE["DaqPointsProduct"] = DaqPoints
 
 function daqsave(h, pts::DaqPointsProduct, name; version=1)
 

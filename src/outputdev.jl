@@ -53,7 +53,7 @@ function daqload(::Type{OutputDev}, h)
     if hasconfig > 0
         config = daqload(h["config"])
     else
-        config = DaqConfig(devname, devtype)
+        config = DaqConfig()
     end
     return OutputDev(devname, devtype, axes, config)
     
