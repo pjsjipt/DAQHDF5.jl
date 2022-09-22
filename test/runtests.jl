@@ -9,7 +9,7 @@ using Dates
 let
     fname = tempname()
     
-    config = DaqConfig("test", "nothing", ix=1, iy=2, sx="TEST", sy="STRING",
+    config = DaqConfig(ix=1, iy=2, sx="TEST", sy="STRING",
                        fx=1.1, fy=1.2, ox=rand(10), oy=rand(20))
     chans = DaqChannels("dev", "teste", "P", 64, "Pa", 101:164)
     chansb = DaqChannels("amb", "envconds", ["T", "Ta", "H", "Pa"], ["°C", "°C", "", "kPa"])
@@ -28,8 +28,8 @@ let
     ptsb = DaqCartesianPoints(w=1:3, z=0.1:0.1:1.0)
     ptsc = DaqPointsProduct((ptsa, ptsb))
 
-    odeva = OutputDev("robot", "ROBOT", ["x", "y", "z"], DaqConfig("robot", "ROBOT"))
-    odevb = OutputDev("ang", "turntable", ["theta"], DaqConfig("ang", "turntable"))
+    odeva = OutputDev("robot", "ROBOT", ["x", "y", "z"], DaqConfig())
+    odevb = OutputDev("ang", "turntable", ["theta"], DaqConfig())
     odevc = OutputDevSet("setup", (odeva, odevb))
     
     
@@ -76,8 +76,6 @@ let
         datab2 = daqload(MeasData, h["measdata2"])
         xdata2 = daqload(h["measurements"])
         
-        @test config1.devname == config.devname
-        @test config1.devtype == config.devtype
         @test config1.iparams == config.iparams
         @test config1.sparams == config.sparams
         @test config1.fparams == config.fparams
@@ -110,8 +108,6 @@ let
         @test data1.chans.chanmap == data.chans.chanmap
         @test data1.chans.units == data.chans.units
 
-        @test config2.devname == config1.devname
-        @test config2.devtype == config1.devtype
         @test config2.iparams == config1.iparams
         @test config2.fparams == config1.fparams
         @test config2.sparams == config1.sparams
@@ -196,7 +192,6 @@ let
 
         @test axesnames(odeva1) == axesnames(odeva)
         @test devname(odeva1) == devname(odeva)
-        @test odeva1.config.devname == devname(odeva)
 
         @test devname(odevc1) == devname(odevc)
         @test axesnames(odevc1) == axesnames(odevc)

@@ -16,19 +16,14 @@ Save a [`DaqConfig`](@ref) object at `h[path]`.
  * `c` `DaqConfig` object to be saved.
 
 """
-function daqsave(h, c::DaqConfig, name=""; version=1)
+function daqsave(h, c::DaqConfig, name; version=1)
 
-    if name==""
-        name = devname(c)
-    end
 
     g = create_group(h, name)
 
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractDaqConfig", "DaqConfig"]
 
-    g["__devname__"] = c.devname
-    g["__devtype__"] = c.devtype
 
     if length(c.iparams) > 0
         gipar = create_group(g, "iparams")
@@ -84,9 +79,6 @@ function daqload(::Type{DaqConfig}, h)
 
     # If we got to this point, everything should work smoothly...
 
-    devname = read(h["__devname__"])
-    devtype = read(h["__devtype__"])
-
     kw = keys(h)
     
     iparams = OrderedDict{String,Int64}()
@@ -128,7 +120,7 @@ function daqload(::Type{DaqConfig}, h)
             
     end
     
-    return DaqConfig(devname, devtype, iparams, fparams, sparams, oparams)
+    return DaqConfig(iparams, fparams, sparams, oparams)
 end
 
     
