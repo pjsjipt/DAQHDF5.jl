@@ -42,7 +42,7 @@ function daqload(::Type{ExperimentSetup}, h)
     axes = read(h["axes"])
     axmap = OrderedDict{String,String}()
     parmap = OrderedDict{String,String}()
-    for (a,p) in zip(axmap, parmap)
+    for (a,p) in zip(axes, params)
         axmap[a] = p
         parmap[p] = a
     end
@@ -52,7 +52,6 @@ function daqload(::Type{ExperimentSetup}, h)
     odev = daqload(h["output_devices"])
 
     return ExperimentSetup(lastpoint, idev, points, odev, axmap, parmap, idx)
-    
     
 end
 

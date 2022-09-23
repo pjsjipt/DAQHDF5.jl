@@ -282,6 +282,15 @@ end
 
         h5open(fname, "r") do h
             s1 = daqload(h["setup"])
+            # Now we will check if we get the same thing
+            @test daqpoints(s1) == daqpoints(s)
+            @test numaxes(s1) == numaxes(s)
+            @test axesnames(s1) == axesnames(s)
+            @test devname(inputdevice(s1)) == devname(inputdevice(s1))
+            @test devname(outputdevice(s1)) == devname(outputdevice(s1))
+            @test s1.axmap == s.axmap
+            @test s1.parmap == s.parmap
+            @test s1.idx ==  s.idx
         end
         
 
