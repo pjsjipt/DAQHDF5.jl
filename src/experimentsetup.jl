@@ -50,8 +50,8 @@ function daqload(::Type{ExperimentSetup}, h)
     idev = daqload(h["input_devices"])
     points = daqload(h["points"])
     odev = daqload(h["output_devices"])
-
-    return ExperimentSetup(lastpoint, idev, points, odev, axmap, parmap, idx)
+    
+    return ExperimentSetup(lastpoint, false, idev, points, odev, axmap, parmap, idx)
     
 end
 

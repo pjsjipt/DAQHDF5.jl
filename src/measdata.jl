@@ -3,11 +3,8 @@
 
 DAQIOTABLE["MeasData"] = MeasData
 
-function daqsave(h, x::MeasData, name=""; version=1)
+function daqsave(h, x::MeasData, name; version=1)
 
-    if name==""
-        name = devname(x)
-    end
     g = create_group(h, name)
 
     attributes(g)["__DAQVERSION__"] = 1
@@ -71,11 +68,8 @@ end
 DAQIOTABLE["MeasDataSet"] = MeasDataSet
 
     
-function daqsave(h, x::MeasDataSet, name=""; version=1)
+function daqsave(h, x::MeasDataSet, name; version=1)
     
-    if name==""
-        name = devname(x)
-    end
     g = create_group(h, name)
 
     attributes(g)["__DAQVERSION__"] = 1
