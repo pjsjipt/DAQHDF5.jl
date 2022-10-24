@@ -4,7 +4,8 @@ using DAQCore
 using HDF5
 
 export daqsave, daqload
-
+export samplingrate, numsamples, daqtime, samplingtimes, samplinghours
+export measdata, daqchannels, numchannels, samplingperiod, devname, devtype
 """
 `daqsave(h, X, name; version=1)`
 
