@@ -26,7 +26,7 @@ function daqload(::Type{ExperimentSetup}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read ExperimentSetup")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `ExperimentSetup`. Version 1 expected. Got $ver", "ExperimentSetup", ver))
     end

@@ -31,7 +31,7 @@ function daqload(::Type{DaqSamplingRate}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read in DaqConfig")
         
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DaqSamplingRate`. Version 1 expected. Got $ver", "DaqSamplingRate", ver))
     end
@@ -42,11 +42,11 @@ function daqload(::Type{DaqSamplingRate}, h)
         throw(DAQIOTypeError("Type error: expected `DaqSamplingRate` got $_type_ "))
     end
 
-    rate = read(h["rate"])
-    nsamples = read(h["nsamples"])
-    ms = read(h["time"])
+    rate = read(h["rate"])[begin]
+    nsamples = read(h["nsamples"])[begin]
+    ms = read(h["time"])[begin]
 
-    t = DateTime(Dates.UTInstant{Millisecond}(Millisecond(ms)))
+    t = DateTime(Dates.UTInstant{Millisecond}(Millisecond(UInt64(ms))))
     
     return DaqSamplingRate(rate, nsamples, t)
 end
@@ -79,7 +79,7 @@ function daqload(::Type{DaqSamplingTimes}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read in DaqSamplingTimes")
         
     # Are we reading the correct version
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver[begin] != 1
         throw(DAQIOVersionError("Error when reading `DaqSamplingTimes`. Version 1 expected. Got $ver", "DaqSamplingTimes", ver))
     end
@@ -93,7 +93,7 @@ function daqload(::Type{DaqSamplingTimes}, h)
     t = read(h["time"])
 
     # We are going to assume that it is a DateTime
-    t1 = [DateTime(Dates.UTInstant{Millisecond}(Millisecond(ms))) for ms in t]
+    t1 = [DateTime(Dates.UTInstant{Millisecond}(Millisecond(UInt64(ms)))) for ms in t]
 
     return DaqSamplingTimes(t1)
     

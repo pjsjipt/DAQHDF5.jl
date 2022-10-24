@@ -35,7 +35,7 @@ function daqload(::Type{MeasData}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DaqConfig")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `MeasData`. Version 1 expected. Got $ver", "MeasData", ver))
     end
@@ -47,8 +47,8 @@ function daqload(::Type{MeasData}, h)
     end
 
 
-    devname = read(h["__devname__"])
-    devtype = read(h["__devtype__"])
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
 
     # Read sampling info
     sampling = daqload(h["sampling"])
@@ -97,7 +97,7 @@ function daqload(::Type{MeasDataSet}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DaqConfig")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `MeasData`. Version 1 expected. Got $ver", "MeasData", ver))
     end
@@ -109,10 +109,10 @@ function daqload(::Type{MeasDataSet}, h)
     end
 
 
-    devname = read(h["__devname__"])
-    devtype = read(h["__devtype__"])
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
     ms = read(h["__time__"])[begin]
-    t = DateTime(Dates.UTInstant{Millisecond}(Millisecond(ms)))
+    t = DateTime(Dates.UTInstant{Millisecond}(Millisecond(UInt64(ms))))
 
     devices = read(h["__devlist__"])
 

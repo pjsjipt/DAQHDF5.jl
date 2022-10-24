@@ -37,7 +37,7 @@ function daqload(::Type{InputDev}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read InputDev")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `InputDev`. Version 1 expected. Got $ver", "InputDev", ver))
     end
@@ -47,9 +47,9 @@ function daqload(::Type{InputDev}, h)
         throw(DAQIOTypeError("Type error: expected `AbstractInputDev` got $_type_ "))
     end
 
-    devname = read(h["__devname__"])
-    devtype = read(h["__devtype__"])
-    haschans = read(h["__haschans__"])
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
+    haschans = read(h["__haschans__"])[begin]
     if haschans > 0
         chans = daqload(h["chans"])
     else
@@ -90,7 +90,7 @@ function daqload(::Type{DeviceSet}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DevicSet")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DeviceSet`. Version 1 expected. Got $ver", "DeviceSet", ver))
     end
@@ -100,8 +100,8 @@ function daqload(::Type{DeviceSet}, h)
         throw(DAQIOTypeError("Type error: expected `DeviceSet` got $_type_ "))
     end
 
-    devname = read(h["__devname__"])
-    devtype = read(h["__devtype__"])
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
 
     devices = read(h["__devices__"])
 

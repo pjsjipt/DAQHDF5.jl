@@ -34,7 +34,7 @@ function daqload(::Type{OutputDev}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read OutputDev")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `OutputDev`. Version 1 expected. Got $ver", "OutputDev", ver))
     end
@@ -44,8 +44,8 @@ function daqload(::Type{OutputDev}, h)
         throw(DAQIOTypeError("Type error: expected `AbstractOutputDev` got $_type_ "))
     end
 
-    devname = read(h["__devname__"])
-    devtype = read(h["__devtype__"])
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
 
     axes = read(h["__axes__"])
     
@@ -86,7 +86,7 @@ function daqload(::Type{OutputDevSet}, h; version=1)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read OutputDevSet")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading `OutputDevSet`. Version 1 expected. Got $ver", "OutputDevSet", ver))
     end
@@ -96,8 +96,8 @@ function daqload(::Type{OutputDevSet}, h; version=1)
         throw(DAQIOTypeError("Type error: expected `OutputDevSet` got $_type_ "))
     end
 
-    devname = read(h["__devname__"])
-    devtype = read(h["__devtype__"])
+    devname = read(h["__devname__"])[begin]
+    devtype = read(h["__devtype__"])[begin]
 
     devices = read(h["__devices__"])
 

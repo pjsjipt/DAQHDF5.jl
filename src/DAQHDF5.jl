@@ -90,7 +90,7 @@ function objectclass(h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read data")
     
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])
+    ver = read(attributes(h)["__DAQVERSION__"])[begin]
     if ver != 1
         throw(DAQIOVersionError("Error when reading object. Version 1 expected. Got $ver", "", ver))
     end
