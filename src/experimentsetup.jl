@@ -26,7 +26,7 @@ function daqload(::Type{ExperimentSetup}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read ExperimentSetup")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])[begin]
+    ver = readelem(attributes(h)["__DAQVERSION__"])
     if ver != 1
         throw(DAQIOVersionError("Error when reading `ExperimentSetup`. Version 1 expected. Got $ver", "ExperimentSetup", ver))
     end
@@ -36,7 +36,7 @@ function daqload(::Type{ExperimentSetup}, h)
         throw(DAQIOTypeError("Type error: expected `ExperimentSetup` got $_type_ "))
     end
 
-    lastpoint = read(h["lastpoint"])
+    lastpoint = readelem(h["lastpoint"])
     idx = read(h["idx"])
     params = read(h["parameters"])
     axes = read(h["axes"])

@@ -79,6 +79,15 @@ function adddaqiomethod(name, iotype)
     DAQIOTABLE[name] = iotype
 end
 
+function readelem(h)
+    val = read(h)
+    if isa(val, Vector)
+        return val[begin]
+    else
+        return val
+    end
+end
+
 """
 `objectclass(h)`
 

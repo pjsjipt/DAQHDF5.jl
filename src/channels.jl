@@ -46,7 +46,7 @@ function daqload(::Type{DaqChannels}, h)
         DAQIOTypeError("No __DAQVERSION__ flag found while trying to read DaqConfig")
 
     # Are we reading the correct version?
-    ver = read(attributes(h)["__DAQVERSION__"])[begin]
+    ver = readelem(attributes(h)["__DAQVERSION__"])
     if ver != 1
         throw(DAQIOVersionError("Error when reading `DaqConfig`. Version 1 expected. Got $ver", "DaqConfig", ver))
     end
@@ -58,15 +58,13 @@ function daqload(::Type{DaqChannels}, h)
     end
 
     # Everything appears to be ok!
-    devname = read(h["__devname__"])[begin]
-    devtype = read(h["__devtype__"])[begin]
-
+    devname = readelem(h["__devname__"])
+    devtype = readelem(h["__devtype__"])
     chans = read(h["channels"])
-
+    
     # Let's hope this is enough
     physchans = read(h["physchans"])
     units = read(h["units"])
-
     return DaqChannels(devname, devtype, chans, units, physchans)
     
 end
