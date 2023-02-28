@@ -269,7 +269,42 @@ end
         
 
     end
-    
+
+    # Let's test the generic interface using serialization
+    let
+        fname = tempname()
+        chans = 64
+
+        tinit = now()
+        rr = DaqSamplingRate(10.0, 10, tinit)
+
+        press = MeasData("press", "DTCInitium", rr, rand(64,10), chans, "Pa")
+
+        x = (rand(5), Dict("a"=>1, "b"=>2, "c"=>3), rand(2,3,4), 1//2)
         
+        h5open(fname, "w") do h
+            daqsave(h, x, "generic_data"; version=1)
+            daqsave(h, press, "pressure"; version=1)
+        end
+
+        y,p = h5open(fname, "r") do h
+            y = daqload(h["generic_data"])
+            p = daqload(h["pressure"])
+            y,p
+        end
+
+        @test x[1] == y[1]
+        @test x[2] == y[2]
+        @test x[3] == y[3]
+        @test x[4] == y[4]
+        
+        @test isa(p, MeasData)
+        @test devname(p) == devname(press)
+        @test devtype(p) == devtype(press)
+        @test p.sampling == press.sampling
+        @test p.data == press.data
+        @test p.chans == chans
+        @test p.units == press.units
+    end        
     
 end

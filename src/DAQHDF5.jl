@@ -115,12 +115,14 @@ function daqload(h)
     # Get the class of object stored
     name = objectclass(h)
     if name ∉ keys(DAQIOTABLE)
-        error("I don't know how to load objects of type $name. Perhaps you need to load the appropriate package?")
+        # We will try to use the standard library module `Serialization`
+        return daqload_generic(h)
     end
 
     return daqload(DAQIOTABLE[name], h)
 end
 
+include("generic.jl")
 include("errors.jl")
 include("config.jl")
 include("channels.jl")
