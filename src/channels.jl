@@ -13,8 +13,6 @@ function daqsave(h, c::DaqChannels, name=""; version=1)
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractDaqChannels", "DaqChannels"]
 
-    g["__devname__"] = c.devname
-    g["__devtype__"] = c.devtype
 
     g["channels"] = daqchannels(c)
 
@@ -26,14 +24,8 @@ function daqsave(h, c::DaqChannels, name=""; version=1)
     else
         phch = c.physchans  # Let's hope this works. I really don't know...
     end
-    if isa(c.units, AbstractVector)
-        units = collect(c.units)
-    else
-        units = c.units  # Let's hope this works. I really don't know...
-    end
     
     g["physchans"] = phch
-    g["units"] = units
 
     return
 end
@@ -58,13 +50,10 @@ function daqload(::Type{DaqChannels}, h)
     end
 
     # Everything appears to be ok!
-    devname = readelem(h["__devname__"])
-    devtype = readelem(h["__devtype__"])
     chans = read(h["channels"])
     
     # Let's hope this is enough
     physchans = read(h["physchans"])
-    units = read(h["units"])
-    return DaqChannels(devname, devtype, chans, units, physchans)
+    return DaqChannels(chans, physchans)
     
 end

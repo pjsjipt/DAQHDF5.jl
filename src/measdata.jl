@@ -18,10 +18,11 @@ function daqsave(h, x::MeasData, name; version=1)
 
     # Saving data
     g["data"] = x.data
+    g["units"] = x.units
     
     #Saving channel info
     daqsave(g, x.chans, "channels", version=version)
-
+    
     return
     
     
@@ -54,11 +55,12 @@ function daqload(::Type{MeasData}, h)
     sampling = daqload(h["sampling"])
     # Read data
     data = read(h["data"])
-
+    units = read(h["units"])
+    
     # Read Channel Info
     chans = daqload(h["channels"])
 
-    return MeasData(devname, devtype, sampling, data, chans)
+    return MeasData(devname, devtype, sampling, data, chans, units)
     
     
 end
