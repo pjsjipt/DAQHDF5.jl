@@ -466,6 +466,63 @@ end
 
     end
     
-             
+
+    # Testing Experiment Setup
+    let
+        fname = tempname()
+        # Let's create a daq device
+        config = DaqConfig(ix=1, iy=2, sx="TEST", sy="STRING",
+                           fx=1.1, fy=1.2, ox=rand(10), oy=rand(20))
+        chans = 1:64
+        chansb = DaqChannels(["T", "Ta", "H", "Pa"])
+
+        tinit = now()
+        rr = DaqSamplingRate(10.0, 10, tinit)
+        rt = DaqSamplingTimes(rr)
+        
+        ideva = InputDev("input_a", "daqboard1", chans, config)
+        idevb = InputDev("input_b", "daqboard2", chansb, nothing)
+        idevc = DeviceSet("a+b", (ideva, idevb), 1)
+
+        # Now the experimental points
+        pts_a = DaqCartesianPoints(x=[-100,0,100], z=[100,200,300,400])
+        pts_b = DaqPoints(ang=0:15.0:345.0)
+        pts = DaqPointsProduct(pts_a, pts_b)
+
+        # Actuators
+        odev_a = TestOutputDev("turntable", ["ang"])
+        odev_b = TestOutputDev("robot", ["x", "z"])
+        odev = OutputDevSet("wind_tunnel", (odev_a, odev_b))
+
+        plan = DaqPlan(odev,  pts)
+        s = ExperimentSetup(idevc, plan, nothing)
+        
+        h5open(fname, "w") do h
+            daqsave(h, s, "setup")
+        end
+
+        h5open(fname, "r") do h
+            s1 = daqload(h["setup"])
+            
+            # Now we will check if we get the same thing
+            @test daqpoints(s1) == daqpoints(s)
+            @test numaxes(s1) == numaxes(s)
+            @test axesnames(s1) == axesnames(s)
+            @test parameters(s1) == parameters(s)
+            @test devname(s1.idev) == devname(idevc)
+            @test devname(s1.idev[1]) == devname(ideva)
+            @test devtype(s1.idev[2]) == devtype(idevb)
+            @test devname(s1.plan) == devname(plan)
+            @test s1.plan.axes == plan.axes
+            @test s1.plan.avals == plan.avals
+            @test s1.filt == nothing
+            @test s1.idev[1].chans == 1:64
+            
+        end
+        
+
+    end
+    
+    
             
 end

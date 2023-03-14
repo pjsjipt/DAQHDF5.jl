@@ -1,4 +1,3 @@
-import DataStructures: OrderedDict
 
 DAQIOTABLE["ExperimentSetup"] = ExperimentSetup
 
@@ -9,14 +8,10 @@ function daqsave(h, dev::ExperimentSetup, name; version=1)
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractExperimentSetup", "ExperimentSetup"]
 
-    g["lastpoint"] = dev.lastpoint
-    g["idx"] = dev.idx
-    g["axes"] = collect(keys(dev.axmap))
-    g["parameters"] = collect(values(dev.axmap))
-
+    
     daqsave(g, dev.idev, "input_devices")
-    daqsave(g, dev.points,"points")
-    daqsave(g, dev.odev, "output_devices")
+    daqsave(g, dev.plan, "plan")
+    daqsave(g, dev.filt, "filter")
 
 end
 
@@ -36,22 +31,14 @@ function daqload(::Type{ExperimentSetup}, h)
         throw(DAQIOTypeError("Type error: expected `ExperimentSetup` got $_type_ "))
     end
 
-    lastpoint = readelem(h["lastpoint"])
-    idx = read(h["idx"])
-    params = read(h["parameters"])
-    axes = read(h["axes"])
-    axmap = OrderedDict{String,String}()
-    parmap = OrderedDict{String,String}()
-    for (a,p) in zip(axes, params)
-        axmap[a] = p
-        parmap[p] = a
+    idev = daqload(h["input_devices"])
+    plan = daqload(h["plan"])
+    if "filt" ∈ keys(h)
+        filt = daqload(h["filt"])
+    else
+        filt = nothing
     end
 
-    idev = daqload(h["input_devices"])
-    points = daqload(h["points"])
-    odev = daqload(h["output_devices"])
-    
-    return ExperimentSetup(lastpoint, false, idev, points, odev, axmap, parmap, idx)
-    
+    return ExperimentSetup(idev, plan, filt)
 end
 
