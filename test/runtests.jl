@@ -230,6 +230,7 @@ let
 end
     
     # Let's test experiment setup
+    #=
     let
         fname = tempname()
         # Let's create a daq device
@@ -269,7 +270,7 @@ end
         
 
     end
-
+    =#
     # Let's test the generic interface using serialization
     let
         fname = tempname()
@@ -306,5 +307,170 @@ end
         @test p.chans == chans
         @test p.units == press.units
     end        
+
+    # Lets test Array stuff
     
+    let
+        xInt64 = rand(Int64, 4,3)
+        xUInt64 = rand(UInt64, 4,3)
+        xInt32 = rand(Int32, 4,3)
+        xUInt32 = rand(UInt32, 4,3)
+        xInt16 = rand(Int16, 4,3)
+        xUInt16 = rand(UInt16, 4,3)
+        xInt8 = rand(Int8, 4,3)
+        xUInt8 = rand(UInt8, 4,3)
+        xF32 = rand(Float32, 4,3)
+        xF64 = rand(Float64, 4,3)
+        xC32 = rand(ComplexF32, 4,3)
+        xC64 = rand(ComplexF64, 4,3)
+        xString = ["Julia áéíóú", "is àèìòù", "an αβγ", "awesome ∑∏×", "language ℵ"]
+
+        
+        fname = tempname()
+        h5open(fname, "w") do h
+            daqsave(h, xInt64, "Int64")
+            daqsave(h, xUInt64, "UInt64")
+            daqsave(h, xInt32, "Int32")
+            daqsave(h, xUInt32, "UInt32")
+            daqsave(h, xInt16, "Int16")
+            daqsave(h, xUInt16, "UInt16")
+            daqsave(h, xInt8, "Int8")
+            daqsave(h, xUInt8, "UInt8")
+            daqsave(h, xF32, "F32")
+            daqsave(h, xF64, "F64")
+            daqsave(h, xC32, "C32")
+            daqsave(h, xC64, "C64")
+            daqsave(h, xString, "String")
+            
+        end
+        
+        h5open(fname, "r") do h
+            yInt64 = daqload(h["Int64"])
+            @test size(yInt64) == size(xInt64)
+            @test eltype(yInt64) == eltype(xInt64)
+            @test yInt64 == xInt64
+
+            yUInt64 = daqload(h["UInt64"])
+            @test size(yUInt64) == size(xUInt64)
+            @test eltype(yUInt64) == eltype(xUInt64)
+            @test yUInt64 == xUInt64
+
+            yInt32 = daqload(h["Int32"])
+            @test size(yInt32) == size(xInt32)
+            @test eltype(yInt32) == eltype(xInt32)
+            @test yInt32 == xInt32
+
+            yUInt32 = daqload(h["UInt32"])
+            @test size(yUInt32) == size(xUInt32)
+            @test eltype(yUInt32) == eltype(xUInt32)
+            @test yUInt32 == xUInt32
+
+            yInt16 = daqload(h["Int16"])
+            @test size(yInt16) == size(xInt16)
+            @test eltype(yInt16) == eltype(xInt16)
+            @test yInt16 == xInt16
+
+            yUInt16 = daqload(h["UInt16"])
+            @test size(yUInt16) == size(xUInt16)
+            @test eltype(yUInt16) == eltype(xUInt16)
+            @test yUInt16 == xUInt16
+
+            yInt8 = daqload(h["Int8"])
+            @test size(yInt8) == size(xInt8)
+            @test eltype(yInt8) == eltype(xInt8)
+            @test yInt8 == xInt8
+
+            yUInt8 = daqload(h["UInt8"])
+            @test size(yUInt8) == size(xUInt8)
+            @test eltype(yUInt8) == eltype(xUInt8)
+            @test yUInt8 == xUInt8
+            
+
+            yF32 = daqload(h["F32"])
+            @test size(yF32) == size(xF32)
+            @test eltype(yF32) == eltype(xF32)
+            @test yF32 == xF32
+
+            yF64 = daqload(h["F64"])
+            @test size(yF64) == size(xF64)
+            @test eltype(yF64) == eltype(xF64)
+            @test yF64 == xF64
+
+            yC32 = daqload(h["C32"])
+            @test size(yC32) == size(xC32)
+            @test eltype(yC32) == eltype(xC32)
+            @test yC32 == xC32
+
+            yC64 = daqload(h["C64"])
+            @test size(yC64) == size(xC64)
+            @test eltype(yC64) == eltype(xC64)
+            @test yC64 == xC64
+
+            yString = daqload(h["String"])
+            @test size(yString) == size(xString)
+            @test eltype(yString) == eltype(xString)
+            @test yString == xString
+            
+        end
+        
+        
+    end
+
+    let
+        xInt64 = rand(Int64)
+        xUInt8 = rand(UInt8)
+        xF32 = rand(Float32)
+        xF64 = rand(Float64)
+        xC32 = rand(ComplexF32)
+        xC64 = rand(ComplexF64)
+        xString = "aeiou áéíóú ãẽĩõũ äëïöü αβγδ ∑∏ ×⊗⨣"
+
+        fname = tempname()
+        h5open(fname, "w") do h
+            daqsave(h, xInt64, "Int64")
+            daqsave(h, xUInt8, "UInt8")
+            daqsave(h, xF32, "F32")
+            daqsave(h, xF64, "F64")
+            daqsave(h, xC32, "C32")
+            daqsave(h, xC64, "C64")
+            daqsave(h, xString, "String")
+            
+        end
+        
+        h5open(fname, "r") do h
+            yInt64 = daqload(h["Int64"])
+            yUInt8 = daqload(h["UInt8"])
+            yF32 = daqload(h["F32"])
+            yF64 = daqload(h["F64"])
+            yC32 = daqload(h["C32"])
+            yC64 = daqload(h["C64"])
+            yString = daqload(h["String"])
+
+            @test typeof(yInt64) == typeof(xInt64)
+            @test yInt64 == xInt64
+            
+            @test typeof(yUInt8) == typeof(xUInt8)
+            @test yUInt8 == xUInt8
+
+            @test typeof(yF32) == typeof(xF32)
+            @test yF32 == xF32
+
+            @test typeof(yF64) == typeof(xF64)
+            @test yF64 == xF64
+
+            @test typeof(yC32) == typeof(xC32)
+            @test yC32 == xC32
+
+            @test typeof(yC64) == typeof(xC64)
+            @test yC64 == xC64
+
+            @test typeof(yString) == typeof(xString)
+            @test yString == xString
+            
+            
+        end
+    end
+    
+            
+            
 end

@@ -44,7 +44,7 @@ function daqload(::Type{MeasData}, h)
     # Check if we are reading an actual DaqConfig
     _type_ = read(attributes(h)["__DAQCLASS__"])
     if _type_[end] != "MeasData"
-        throw(DAQIOTypeError("Type error: expected `DaqChannels` got $_type_ "))
+        throw(DAQIOTypeError("Type error: expected `MeasData` got $_type_ "))
     end
 
 
