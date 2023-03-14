@@ -229,48 +229,6 @@ let
     end
 end
     
-    # Let's test experiment setup
-    #=
-    let
-        fname = tempname()
-        # Let's create a daq device
-        dev = TestDaq("amb")
-        daqaddinput(dev, ["T", "Tbs", "Tbu", "Pa"], amp=0.0, freq=10.0, offset=1.0)
-
-        # Now the experimental points
-        pts_a = DaqCartesianPoints(x=[-100,0,100], z=[100,200,300,400])
-        pts_b = DaqPoints(ang=0:15.0:345.0)
-        pts = DaqPointsProduct(pts_a, pts_b)
-
-        # Actuators
-        odev_a = TestOutputDev("turntable", ["θ"])
-        odev_b = TestOutputDev("robot", ["A", "B"])
-        odev = OutputDevSet("wind_tunnel", (odev_a, odev_b))
-
-        axmap = OrderedDict("A"=>"z", "θ"=>"ang", "B"=>"x")
-        
-        s = ExperimentSetup(dev, pts, odev, axmap)
-
-        h5open(fname, "w") do h
-            daqsave(h, s, "setup")
-        end
-
-        h5open(fname, "r") do h
-            s1 = daqload(h["setup"])
-            # Now we will check if we get the same thing
-            @test daqpoints(s1) == daqpoints(s)
-            @test numaxes(s1) == numaxes(s)
-            @test axesnames(s1) == axesnames(s)
-            @test devname(inputdevice(s1)) == devname(inputdevice(s1))
-            @test devname(outputdevice(s1)) == devname(outputdevice(s1))
-            @test s1.axmap == s.axmap
-            @test s1.parmap == s.parmap
-            @test s1.idx ==  s.idx
-        end
-        
-
-    end
-    =#
     # Let's test the generic interface using serialization
     let
         fname = tempname()
@@ -471,6 +429,43 @@ end
         end
     end
     
-            
+
+    # Let's  test DaqPlan
+
+    let
+        fname = tempname()
+        # Let's create a daq device
+        # Now the experimental points
+        pts_a = DaqCartesianPoints(x=[-100,0,100], z=[100,200,300,400])
+        pts_b = DaqPoints(ang=0:15.0:345.0)
+        pts = DaqPointsProduct(pts_a, pts_b)
+
+        # Actuators
+        odev_a = TestOutputDev("turntable", ["ang"])
+        odev_b = TestOutputDev("robot", ["x", "z"])
+        odev = OutputDevSet("wind_tunnel", (odev_a, odev_b))
+
+        s = DaqPlan(odev,  pts)
+
+        h5open(fname, "w") do h
+            daqsave(h, s, "setup")
+        end
+
+        h5open(fname, "r") do h
+            s1 = daqload(h["setup"])
+            # Now we will check if we get the same thing
+            @test daqpoints(s1) == daqpoints(s)
+            @test numaxes(s1) == numaxes(s)
+            @test axesnames(s1) == axesnames(s)
+            @test parameters(s1) == parameters(s)
+            @test devname(s1) == devname(s)
+            @test s1.axes ==  s.axes
+            @test s1.avals == s.avals
+        end
+        
+
+    end
+    
+             
             
 end
