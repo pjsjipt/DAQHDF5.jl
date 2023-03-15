@@ -2,7 +2,7 @@
 # Experiment Plan
 
 
-DAQIOTABLE["DaqPlan"] = DaqPlan
+DAQIOTABLE["DaqPlan"] = AbstractDaqPlan
 
 function daqsave(h, dev::DaqPlan; version=1)
 
@@ -13,12 +13,12 @@ function daqsave(h, dev::DaqPlan; version=1)
 
     g["devname"] = devname(dev)
     g["devtype"] = devtype(dev)
-    g["lastpoint"] = dev.lastpoint
-    g["axes"] = dev.axes
-    g["avals"] = dev.avals
+    g["lastpoint"] = lastpoint(dev)
+    g["axes"] = axesnames(dev)
+    g["avals"] = axesvals(dev)
 
-    daqsave(g, dev.dev, "output_devices")
-    daqsave(g, dev.points, "points")
+    daqsave(g, outputdevice(dev), "output_device")
+    daqsave(g, planpoints(dev), "points")
     
 end
 
@@ -47,7 +47,7 @@ function daqload(::Type{DaqPlan}, h)
     avals = read(h["avals"])
     
 
-    dev = daqload(h["output_devices"])
+    dev = daqload(h["output_device"])
     points = daqload(h["points"])
 
     return DaqPlan(dname, dtype, lastpoint, false, dev, points, axes, avals)
