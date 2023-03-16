@@ -1,8 +1,9 @@
 
 DAQIOTABLE["ExperimentSetup"] = ExperimentSetup
+DAQIOTABLE["AbstractExperimentSetup"] = ExperimentSetup
 
 
-function daqsave(h, dev::ExperimentSetup, name; version=1)
+function daqsave(h, dev::AbstractExperimentSetup, name; version=1)
     g = create_group(h, name)
 
     attributes(g)["__DAQVERSION__"] = 1
@@ -11,7 +12,13 @@ function daqsave(h, dev::ExperimentSetup, name; version=1)
     
     daqsave(g, dev.idev, "input_devices")
     daqsave(g, dev.plan, "plan")
-    daqsave(g, dev.filt, "filter")
+    if dev.config != nothing
+        daqsave(g, dev.config, "config")
+    end
+    if dev.filt != nothing
+        daqsave(g, dev.filt, "filter")
+    end
+    
 
 end
 
@@ -27,18 +34,24 @@ function daqload(::Type{ExperimentSetup}, h)
     end
 
     _type_ = read(attributes(h)["__DAQCLASS__"])
-    if _type_[end] != "ExperimentSetup"
+    if "AbstractExperimentSetup" ∉ _type_ 
         throw(DAQIOTypeError("Type error: expected `ExperimentSetup` got $_type_ "))
     end
 
     idev = daqload(h["input_devices"])
     plan = daqload(h["plan"])
-    if "filt" ∈ keys(h)
-        filt = daqload(h["filt"])
+    if "config" ∈ keys(h)
+        config = daqload(h["config"])
+    else
+        config = nothing
+    end
+    
+    if "filter" ∈ keys(h)
+        filt = daqload(h["filter"])
     else
         filt = nothing
     end
 
-    return ExperimentSetup(idev, plan, filt)
+    return ExperimentSetup(idev, plan, config, filt)
 end
 

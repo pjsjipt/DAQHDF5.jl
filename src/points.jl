@@ -1,20 +1,18 @@
 DAQIOTABLE["DaqPoints"] = DaqPoints
+DAQIOTABLE["AbstractDaqPoints"] = DaqPoints
 DAQIOTABLE["DaqCartesianPoints"] = DaqCartesianPoints
 DAQIOTABLE["DaqPointsProduct"] = DaqPointsProduct
 
 
-function daqsave(h, pts::DaqPoints, name; version=1)
+function daqsave(h, pts::AbstractDaqPoints, name; version=1)
 
     g = create_group(h, name)
 
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractDaqPoints", "DaqPoints"]
 
-    g["__devname__"] = "points_$name"
-    g["__devtype__"] = "DaqPoints"
-
-    g["params"] = pts.params
-    g["points"] = pts.pts
+    g["params"] = parameters(pts)
+    g["points"] = daqpoints(pts)
     
     return
 end
@@ -32,7 +30,7 @@ function daqload(::Type{DaqPoints}, h)
     
     # Check if we are reading an actual DaqConfig
     _type_ = read(attributes(h)["__DAQCLASS__"])
-    if _type_[end] != "DaqPoints"
+    if "AbstractDaqPoints" ∉ _type_
         throw(DAQIOTypeError("Type error: expected `DaqPoints` got $_type_ "))
     end
 
@@ -51,11 +49,8 @@ function daqsave(h, pts::DaqCartesianPoints, name; version=1)
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractDaqPoints", "DaqCartesianPoints"]
 
-    g["__devname__"] = "points_$name"
-    g["__devtype__"] = "DaqCartesianPoints"
-
-    g["params"] = pts.params
-    g["points"] = pts.pts
+    g["params"] = parameters(pts)
+    g["points"] = daqpoints(pts)
     gax = create_group(g, "axes")
 
     for (i,ax) in enumerate(pts.axes)
@@ -106,8 +101,8 @@ function daqsave(h, pts::DaqPointsProduct, name; version=1)
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractDaqPoints", "DaqPointsProduct"]
 
-    g["__devname__"] = "points_$name"
-    g["__devtype__"] = "DaqPointsProduct"
+    g["params"] = parameters(pts)
+    g["points"] = daqpoints(pts)
 
     g["numpoints"] = length(pts.points)
     g["ptsidx"] = pts.ptsidx
@@ -120,8 +115,6 @@ function daqsave(h, pts::DaqPointsProduct, name; version=1)
     end
     
         
-    g["params"] = parameters(pts)
-    g["points"] = daqpoints(pts)
     
     return
 end

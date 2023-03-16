@@ -37,7 +37,7 @@ let
     idevb = InputDev("input_b", "daqboard2", nothing, nothing)
     idevc = DeviceSet("a+b", (ideva, idevb), 1)
     
-    
+    fname = "/home/pjabardo/temp/teste.h5"
     h5open(fname, "w") do h
         daqsave(h, config, "config")
         daqsave(h, chans, "channels")
@@ -495,7 +495,7 @@ end
         odev = OutputDevSet("wind_tunnel", (odev_a, odev_b))
 
         plan = DaqPlan(odev,  pts)
-        s = ExperimentSetup(idevc, plan, nothing)
+        s = ExperimentSetup(idevc, plan, nothing, nothing)
         
         h5open(fname, "w") do h
             daqsave(h, s, "setup")
