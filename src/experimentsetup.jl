@@ -9,7 +9,6 @@ function daqsave(h, dev::AbstractExperimentSetup, name; version=1)
     attributes(g)["__DAQVERSION__"] = 1
     attributes(g)["__DAQCLASS__"] = ["AbstractExperimentSetup", "ExperimentSetup"]
 
-    
     daqsave(g, dev.idev, "input_devices")
     daqsave(g, dev.plan, "plan")
     if dev.config != nothing

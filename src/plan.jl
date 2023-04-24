@@ -3,9 +3,10 @@
 
 
 DAQIOTABLE["DaqPlan"] = AbstractDaqPlan
+DAQIOTABLE["AbstractDaqPlan"] = AbstractDaqPlan
 
-function daqsave(h, dev::AbstractDaqPlan; version=1)
 
+function daqsave(h, dev::AbstractDaqPlan, name; version=1)
     g = create_group(h, name)
 
     attributes(g)["__DAQVERSION__"] = 1
